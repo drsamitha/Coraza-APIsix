@@ -9,9 +9,10 @@ loaded by APISIX's Wasm plugin runtime.
 
 | Service  | Image                              | Role                                |
 |----------|-------------------------------------|--------------------------------------|
-| etcd     | `quay.io/coreos/etcd`               | APISIX configuration store           |
-| apisix   | built from `apisix/Dockerfile`      | API gateway + Coraza WAF (CRS)       |
-| httpbin  | `mccutchen/go-httpbin`              | Demo upstream service                |
+| etcd      | `quay.io/coreos/etcd`               | APISIX configuration store           |
+| apisix    | built from `apisix/Dockerfile`      | API gateway + Coraza WAF (CRS)       |
+| httpbin   | `mccutchen/go-httpbin`              | Demo upstream service                |
+| dashboard | `apache/apisix-dashboard`           | Web UI for routes and plugin config  |
 
 ## Prerequisites
 
@@ -50,6 +51,18 @@ hosts by default.
 | 9180 | APISIX Admin API    |
 | 8080 | httpbin (direct)    |
 | 2379 | etcd client API     |
+| 9000 | Dashboard UI        |
+
+## Dashboard
+
+A web UI is available at `http://localhost:9000` (login `admin` / `admin`).
+It reads and writes the same etcd store as the Admin API, so routes,
+upstreams, and the `coraza-filter` plugin's CRS directives can be viewed or
+edited there directly, and changes take effect the same way as the CLI
+scripts below — no reload needed.
+
+Change the default credentials and secret in `dashboard/conf.yaml` before
+using this outside a local test environment.
 
 ## Testing config reload under load
 
@@ -74,6 +87,7 @@ inspect the full log at `/tmp/coraza-load-test.log`.
 
 ```
 apisix/                APISIX image (Dockerfile, config.yaml)
+dashboard/              Dashboard config (conf.yaml)
 docker-compose.yml      Service definitions
 scripts/
   push-route.sh          Registers the demo route and upstream

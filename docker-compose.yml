@@ -34,6 +34,17 @@ services:
     ports:
       - "8080:8080"
 
+  dashboard:
+    image: apache/apisix-dashboard:3.0.1-alpine
+    container_name: coraza-test-dashboard
+    depends_on:
+      etcd:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./dashboard/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+
 networks:
   default:
     name: coraza-test-net
