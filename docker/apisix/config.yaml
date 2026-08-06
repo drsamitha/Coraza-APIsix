@@ -1,0 +1,30 @@
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: etcd
+  etcd:
+    host:
+      - "http://etcd:2379"
+    prefix: "/apisix"
+  admin:
+    allow_admin:
+      - 0.0.0.0/0
+    admin_key:
+      - name: admin
+        key: edd1c9f034335f136f87ad84b625c8f
+        role: admin
+
+apisix:
+  node_listen: 9080
+  enable_admin: true
+  enable_ipv6: false
+
+# Phase 2 (wasm-binary/CRS-version reload test) will make
+# scripts/swap-wasm-reload.sh edit the `file:` path below in place and run
+# `apisix reload` inside the container. Phase 1 just needs one binary up so
+# the etcd hot-sync test (SecRuleEngine toggle, no reload at all) can run.
+wasm:
+  plugins:
+    - name: coraza-filter
+      priority: 7999
+      file: /usr/local/apisix/proxywasm/coraza-proxy-wasm.wasm
