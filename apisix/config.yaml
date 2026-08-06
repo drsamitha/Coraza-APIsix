@@ -19,10 +19,6 @@ apisix:
   enable_admin: true
   enable_ipv6: false
 
-# Phase 2 (wasm-binary/CRS-version reload test) will make
-# scripts/swap-wasm-reload.sh edit the `file:` path below in place and run
-# `apisix reload` inside the container. Phase 1 just needs one binary up so
-# the etcd hot-sync test (SecRuleEngine toggle, no reload at all) can run.
 wasm:
   plugins:
     - name: coraza-filter
