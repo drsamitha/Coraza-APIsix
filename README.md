@@ -70,6 +70,24 @@ custom wasm plugin, so without it the dashboard refuses to save any route
 that references it (`schema not found` error), in both the visual plugin
 editor and the raw JSON editor.
 
+### Custom rules: what actually works
+
+`Include @crs-setup-conf` and `Include @owasp_crs/*.conf` look like
+filesystem paths but aren't — CRS is compiled into the `.wasm` binary at
+build time (Go's `embed`), and `@`-prefixed names are the only resources
+the plugin can `Include`. There's no live directory to drop a `.conf`
+file into, and no config option to allow one: pointing `Include` at a
+real mounted file (e.g. `Include /tmp/custom.conf`) fails outright -
+the wasm sandbox has no general filesystem access, and the plugin
+rejects it with `failed to readfile: ... invalid name`, breaking the
+route (`503`) until reverted.
+
+The only way to add a custom rule that takes effect immediately is an
+inline `SecRule` string appended to `directives_map.default`, via the
+Admin API, the dashboard, or `scripts/toggle-etcd-rule.sh`'s pattern -
+that's a plain JSON/etcd write, not a file read, so it hits the same
+hot-sync path documented below.
+
 ### Adding a custom rule via the GUI
 
 1. Log in at `http://localhost:9000` (`admin` / `admin`).
