@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Hammers the route continuously and logs timestamp, HTTP status, and
-# request time to a file - the evidence for "no downtime" rather than an
-# assumption. Run this in the background, run a swap script while it's
-# running, then Ctrl+C (or kill) it and inspect the log / summary.
+# Continuously requests the route and logs timestamp + HTTP status, so a
+# reload can be measured for dropped requests. Run in the background,
+# trigger a reload in another terminal, then Ctrl+C to see the summary.
 #
 # Usage: ./load-test.sh [output-log] [interval-seconds]
 set -euo pipefail

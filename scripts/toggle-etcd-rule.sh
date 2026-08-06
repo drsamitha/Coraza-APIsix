@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Test 2 (etcd config hot-sync path, contrast case):
-# Flips SecRuleEngine On/Off on the live route via the Admin API. This only
-# rewrites the route's `conf` in etcd - every APISIX worker watches etcd and
-# swaps it into shared memory on its own. No `apisix reload` call here at
-# all, no nginx worker restart. Run scripts/load-test.sh in the background
-# first so you have traffic in flight while this runs.
+# Flips SecRuleEngine On/Off on the live route via the Admin API. This
+# rewrites the route's plugin config in etcd - every APISIX worker watches
+# etcd and applies the change on its own, with no reload command and no
+# worker restart. Run scripts/load-test.sh in the background first to
+# observe this happening under live traffic.
 #
 # Usage: ./toggle-etcd-rule.sh On|Off
 set -euo pipefail

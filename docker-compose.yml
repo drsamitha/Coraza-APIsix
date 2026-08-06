@@ -26,8 +26,6 @@ services:
       - "9080:9080"   # data plane (HTTP)
       - "9180:9180"   # admin API
     volumes:
-      # config.yaml is baked into the image at build time, but we re-mount it
-      # so scripts/swap-wasm-reload.sh can edit it in place without rebuilding.
       - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml
 
   httpbin:
