@@ -16,6 +16,7 @@ curl -sS -o /dev/null -w 'upstream: %{http_code}\n' \
 curl -sS -o /dev/null -w 'route: %{http_code}\n' \
   "$ADMIN/apisix/admin/routes/1" -X PUT \
   -H "X-API-KEY: $KEY" -d '{
+    "name": "coraza-demo",
     "uri": "/*",
     "upstream_id": "1",
     "plugins": {

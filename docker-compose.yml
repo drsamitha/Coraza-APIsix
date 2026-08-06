@@ -44,6 +44,7 @@ services:
       - "9000:9000"
     volumes:
       - ./dashboard/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+      - ./dashboard/schema.json:/usr/local/apisix-dashboard/conf/schema.json:ro
 
 networks:
   default:
