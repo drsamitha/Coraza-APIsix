@@ -88,6 +88,34 @@ Admin API, the dashboard, or `scripts/toggle-etcd-rule.sh`'s pattern -
 that's a plain JSON/etcd write, not a file read, so it hits the same
 hot-sync path documented below.
 
+**For a large ruleset**, inlining every rule as a `directives_map` string
+doesn't scale (etcd value size limits, unreadable JSON). The only option
+is the same one CRS itself uses: vendor the `.conf` files into
+`coraza-proxy-wasm`'s source tree and compile them into a new `.wasm`
+binary, then get APISIX to load it via `config.yaml`'s
+`wasm.plugins[].file` path and `apisix reload` - not an etcd write, so
+it's a different (and slower to iterate) path than the single-rule case
+above.
+
+This was verified directly: two builds of `coraza-proxy-wasm` (different
+upstream versions, standing in for "rebuilt with a different ruleset")
+were baked into one image, `config.yaml` was pointed at the second one,
+and `apisix reload` was run while a request loop hit the route
+continuously - zero dropped or errored requests across the swap.
+`apisix reload` is a graceful nginx worker reload: new workers load the
+new binary, old workers finish in-flight requests and exit, so this is
+"hot" in the no-downtime sense even though it needs an explicit reload
+command and a rebuilt binary, unlike the instant etcd path above.
+
+One operational gotcha found in the process: if `config.yaml` is a
+Docker bind-mounted single file (as it is here), editing it with
+`sed -i` either fails outright (`Device or resource busy`, if run
+inside the container) or silently stops working (if run on the host,
+since `sed -i` replaces the file via rename, and the container's mount
+stays pinned to the old, now-orphaned inode). Editing it in place
+without a rename - e.g. `sed '...' file > tmp && cat tmp > file` run
+inside the container - avoids both failure modes.
+
 ### Adding a custom rule via the GUI
 
 1. Log in at `http://localhost:9000` (`admin` / `admin`).
